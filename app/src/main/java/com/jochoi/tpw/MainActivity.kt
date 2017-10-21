@@ -90,10 +90,14 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Art
         articles_progress_bar.visibility = View.INVISIBLE
         // after data is finished being fetch, need to render it in the recycler view
         if (data != null && data.isNotEmpty()) {
-            // bind the adapter we created to the recycler view
-            // I believe that the reason you can pass in "this" as an instance of
-            // ListItemClickListener is because MainActivity implements the
-            // ArticleAdapter.ListItemClickListener interface
+            /*
+            * bind the adapter we created to the recycler view
+            * I believe that the reason you can pass in "this" as an instance of
+            * ListItemClickListener is because MainActivity implements the
+            * ArticleAdapter.ListItemClickListener interface
+            * the reason why you need "this" is because you need to give the adapter some context
+            * about where you are at
+            */
             rv_articles.adapter = ArticleAdapter(this, data)
         }
     }

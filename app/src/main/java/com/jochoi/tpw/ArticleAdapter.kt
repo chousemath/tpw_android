@@ -11,6 +11,7 @@ import android.widget.TextView
 
 /**
  * Created by jo on 10/21/17.
+ * RecyclerView.Adapter requires that certain functions be populated
  */
 class ArticleAdapter(val mListItemClickListener: ListItemClickListener,
                      val articleData: List<Article>): RecyclerView.Adapter<ArticleAdapter.ArticleViewHolder>() {
@@ -32,6 +33,7 @@ class ArticleAdapter(val mListItemClickListener: ListItemClickListener,
         holder?.articleDescription?.text = articleData[position].description
     }
 
+    // required by RecyclerView.Adapter
     override fun getItemCount(): Int {
         return articleData.size
     }
@@ -41,6 +43,7 @@ class ArticleAdapter(val mListItemClickListener: ListItemClickListener,
     // In order to make sure all list items are clickable, need to extend class (View.OnClickListener)
     inner class ArticleViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
         // you have to explicitly declare this list item as clickable
+        // in order to use the context given from MainActivity, you need the "init" statement
         init {
             itemView.setOnClickListener(this)
         }
