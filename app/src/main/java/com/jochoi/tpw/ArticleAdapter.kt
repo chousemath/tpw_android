@@ -50,7 +50,6 @@ class ArticleAdapter(val mListItemClickListener: ListItemClickListener,
             // without the "inner" modifier, we would not be able to access the fields of the
             // outer class
             // adapterPosition will actually invoke getAdapterPosition(), does boilerplate for us
-            print("INSIDE THE ON CLICK IN ARTICLE ADAPTER")
             mListItemClickListener.onListItemClick(articleData[adapterPosition])
         }
 

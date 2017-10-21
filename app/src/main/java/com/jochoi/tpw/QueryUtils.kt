@@ -83,15 +83,18 @@ object QueryUtils {
             val articleArray = jsonBody.getJSONArray("articles")
             for (i in 0..articleArray.length() - 1) {
                 val currArticle = articleArray.getJSONObject(i)
-                val title = if (currArticle.has("title")) currArticle.getString("title") else ""
-                val description = if (currArticle.has("description")) currArticle.getString("description") else ""
-                val titleKorean = if (currArticle.has("title_korean")) currArticle.getString("title_korean") else ""
-                val descriptionKorean = if (currArticle.has("description_korean")) currArticle.getString("description_korean") else ""
+                val title = if (checkAttrString(currArticle, "title")) currArticle.getString("title")
+                            else "No english title available"
+                val description = if (checkAttrString(currArticle, "description")) currArticle.getString("description")
+                                  else "No english description available"
+                val titleKorean = if (checkAttrString(currArticle, "title_korean")) currArticle.getString("title_korean")
+                                  else "No korean title available"
+                val descriptionKorean = if (checkAttrString(currArticle, "description_korean")) currArticle.getString("description_korean")
+                                        else "No korean description available"
                 // ensure that there is some kind of default URL for downloadLink attribute
                 // not ensuring this will cause an exception at startActivity(browerIntent)
-                val downloadLink = if (currArticle.has("download_link") && currArticle.getString("download_link").isNotEmpty()) {
-                    currArticle.getString("download_link")
-                } else "https://www.thingiverse.com/"
+                val downloadLink = if (checkAttrString(currArticle, "download_link")) currArticle.getString("download_link")
+                                   else "https://www.thingiverse.com/"
                 val cardTags: JSONArray = if (currArticle.has("card_tags")) currArticle.getJSONArray("card_tags") else JSONArray()
                 articles.add(Article(title, description, titleKorean, descriptionKorean, downloadLink, cardTags))
             }
@@ -100,5 +103,9 @@ object QueryUtils {
         }
 
         return articles
+    }
+
+    private fun checkAttrString(attributeObj: JSONObject, key: String): Boolean {
+        return attributeObj.has(key) && attributeObj.getString(key).isNotEmpty()
     }
 }

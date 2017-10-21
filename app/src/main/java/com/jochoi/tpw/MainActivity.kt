@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Art
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         // by default, the recycler view should be shown vertically
+        // using the Kotlin plugin, you don't need to us findbyid, just refer to it by id as name
         rv_articles.layoutManager = LinearLayoutManager(this)
         // Basically whenever items are inserted, moved or removed the size (width and height) of
         // RecyclerView might change and in turn the size of any other view in view hierarchy might
@@ -48,6 +50,8 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Art
     }
 
     private fun runLoaders() {
+        // progress bar is invisible by default, make it visible while data is being fetched
+        articles_progress_bar.visibility = View.VISIBLE
         // need to check your network connection
         val connManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connManager.activeNetworkInfo
@@ -55,6 +59,8 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Art
         if (networkInfo != null && networkInfo.isConnected) {
             loaderManager.initLoader(mArticleLoaderId, null, this)
         } else {
+            // remove progress bar because connection attempt has failed
+            articles_progress_bar.visibility = View.INVISIBLE
             // friendly warning that network connection is not available
             Toast.makeText(this, "No network connection", Toast.LENGTH_SHORT).show()
         }
@@ -80,6 +86,8 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Art
     }
 
     override fun onLoadFinished(loader: Loader<List<Article>>?, data: List<Article>?) {
+        // if data has been successfully fetched, should hide the progress bar
+        articles_progress_bar.visibility = View.INVISIBLE
         // after data is finished being fetch, need to render it in the recycler view
         if (data != null && data.isNotEmpty()) {
             // bind the adapter we created to the recycler view
