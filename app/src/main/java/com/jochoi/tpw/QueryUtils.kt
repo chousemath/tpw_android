@@ -87,7 +87,11 @@ object QueryUtils {
                 val description = if (currArticle.has("description")) currArticle.getString("description") else ""
                 val titleKorean = if (currArticle.has("title_korean")) currArticle.getString("title_korean") else ""
                 val descriptionKorean = if (currArticle.has("description_korean")) currArticle.getString("description_korean") else ""
-                val downloadLink = if (currArticle.has("download_link")) currArticle.getString("download_link") else ""
+                // ensure that there is some kind of default URL for downloadLink attribute
+                // not ensuring this will cause an exception at startActivity(browerIntent)
+                val downloadLink = if (currArticle.has("download_link") && currArticle.getString("download_link").isNotEmpty()) {
+                    currArticle.getString("download_link")
+                } else "https://www.thingiverse.com/"
                 val cardTags: JSONArray = if (currArticle.has("card_tags")) currArticle.getJSONArray("card_tags") else JSONArray()
                 articles.add(Article(title, description, titleKorean, descriptionKorean, downloadLink, cardTags))
             }

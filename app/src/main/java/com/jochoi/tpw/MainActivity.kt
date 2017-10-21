@@ -3,14 +3,32 @@ package com.jochoi.tpw
 import android.app.LoaderManager
 import android.content.AsyncTaskLoader
 import android.content.Context
+import android.content.Intent
 import android.content.Loader
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
+import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
+import android.widget.LinearLayout
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Article>> {
+class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Article>>, ArticleAdapter.ListItemClickListener {
+    private val logTag = MainActivity::class.java.simpleName
+
+    override fun onListItemClick(article: Article) {
+        // Intent.ACTION_VIEW is a placeholder for "android.intent.action.VIEW"
+        Log.d(logTag, "downloadLink: " + article.downloadLink)
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(article.downloadLink))
+        try {
+            startActivity(browserIntent)
+        } catch (e: Exception) {
+            Log.e(logTag, "Browser Intent Start Activity Failed: " + e)
+        }
+    }
 
     private val mArticleLoaderId = 1
     private val urlAllCards = "https://proto3d.herokuapp.com/cards"
@@ -18,6 +36,14 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Art
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        // by default, the recycler view should be shown vertically
+        rv_articles.layoutManager = LinearLayoutManager(this)
+        // Basically whenever items are inserted, moved or removed the size (width and height) of
+        // RecyclerView might change and in turn the size of any other view in view hierarchy might
+        // change. This is particularly troublesome if items are added or removed frequently.
+        // Avoid unnecessary layout passes by setting setHasFixedSize to true when you are adding or
+        // removing items in the RecyclerView and that doesn't change it's height or the width.
+        rv_articles.setHasFixedSize(true)
         runLoaders()
     }
 
@@ -54,6 +80,13 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<Art
     }
 
     override fun onLoadFinished(loader: Loader<List<Article>>?, data: List<Article>?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // after data is finished being fetch, need to render it in the recycler view
+        if (data != null && data.isNotEmpty()) {
+            // bind the adapter we created to the recycler view
+            // I believe that the reason you can pass in "this" as an instance of
+            // ListItemClickListener is because MainActivity implements the
+            // ArticleAdapter.ListItemClickListener interface
+            rv_articles.adapter = ArticleAdapter(this, data)
+        }
     }
 }
